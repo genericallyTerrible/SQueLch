@@ -33,21 +33,58 @@ namespace SQueLch
             if (connectForm.DialogResult == DialogResult.OK)
             {
                 Conn.ConnectionString = connectForm.ConnectionString;
+
+                try
+                {
+                    Conn.Open();
+
+                    MySqlCommand dbCmd = conn.CreateCommand();
+                    dbCmd.CommandText = "show databases";
+                    MySqlDataReader dbReader = dbCmd.ExecuteReader();
+                    string database;
+                    
+                    while (dbReader.Read())
+                    {
+                        database = "";
+                        for (int i = 0; i < dbReader.FieldCount; i++)
+                            database += dbReader.GetValue(i).ToString();
+
+                        databaseTV.Nodes.Add(database);
+                    }
+                    dbReader.Close();
+
+                    MySqlCommand tableCmd = conn.CreateCommand();
+                    MySqlDataReader tableReader;
+                    string table;
+                    
+                    for (int i = 0; i < databaseTV.Nodes.Count; i++)
+                    {
+                        database = databaseTV.Nodes[i].Text;
+                        tableCmd.CommandText = "SHOW TABLES IN " + database;
+                        tableReader = tableCmd.ExecuteReader();
+                        while (tableReader.Read())
+                        {
+                            table = "";
+                            for (int j = 0; j < tableReader.FieldCount; j++)
+                            {
+                                table += tableReader.GetValue(j).ToString();
+                            }
+
+                            databaseTV.Nodes[i].Nodes.Add(table);
+                        }
+                        tableReader.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+
             }
             else
             {
                 Application.Exit();
             }
-
-            try
-            {
-                Conn.Open();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
         }
 
         private void SQueLchForm_FormClosing(object sender, FormClosingEventArgs e)

@@ -21,3 +21,4 @@ D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\obj\Debug\SQueLch.Propert
 D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\obj\Debug\SQueLch.csproj.GenerateResource.Cache
 D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\bin\Debug\MySql.Data.dll
 D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\bin\Debug\MySql.Data.xml
+D:\Users\jmoeh\Google Drive\Databases Midterm\SQueLch\bin\Debug\MySql.Data.xml
