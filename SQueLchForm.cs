@@ -37,43 +37,7 @@ namespace SQueLch
                 try
                 {
                     Conn.Open();
-
-                    MySqlCommand dbCmd = conn.CreateCommand();
-                    dbCmd.CommandText = "show databases";
-                    MySqlDataReader dbReader = dbCmd.ExecuteReader();
-                    string database;
-                    
-                    while (dbReader.Read())
-                    {
-                        database = "";
-                        for (int i = 0; i < dbReader.FieldCount; i++)
-                            database += dbReader.GetValue(i).ToString();
-
-                        databaseTV.Nodes.Add(database);
-                    }
-                    dbReader.Close();
-
-                    MySqlCommand tableCmd = conn.CreateCommand();
-                    MySqlDataReader tableReader;
-                    string table;
-                    
-                    for (int i = 0; i < databaseTV.Nodes.Count; i++)
-                    {
-                        database = databaseTV.Nodes[i].Text;
-                        tableCmd.CommandText = "SHOW TABLES IN " + database;
-                        tableReader = tableCmd.ExecuteReader();
-                        while (tableReader.Read())
-                        {
-                            table = "";
-                            for (int j = 0; j < tableReader.FieldCount; j++)
-                            {
-                                table += tableReader.GetValue(j).ToString();
-                            }
-
-                            databaseTV.Nodes[i].Nodes.Add(table);
-                        }
-                        tableReader.Close();
-                    }
+                    UpdateSchemaTree();
                 }
                 catch (Exception ex)
                 {
@@ -87,9 +51,70 @@ namespace SQueLch
             }
         }
 
+        private void UpdateSchemaTree()
+        {
+            if (Conn.State == ConnectionState.Open)
+            {
+                schemasTreeView.Nodes.Clear();
+
+                try
+                {
+                    MySqlCommand dbCmd = conn.CreateCommand();
+                    dbCmd.CommandText = "show databases";
+                    MySqlDataReader dbReader = dbCmd.ExecuteReader();
+                    string database;
+
+                    while (dbReader.Read())
+                    {
+                        database = "";
+                        for (int i = 0; i < dbReader.FieldCount; i++)
+                            database += dbReader.GetValue(i).ToString();
+
+                        schemasTreeView.Nodes.Add(database);
+                    }
+                    dbReader.Close();
+
+                    MySqlCommand tableCmd = conn.CreateCommand();
+                    MySqlDataReader tableReader;
+                    string table;
+
+                    for (int i = 0; i < schemasTreeView.Nodes.Count; i++)
+                    {
+                        database = schemasTreeView.Nodes[i].Text;
+                        tableCmd.CommandText = "SHOW TABLES IN " + database;
+                        tableReader = tableCmd.ExecuteReader();
+                        while (tableReader.Read())
+                        {
+                            table = "";
+                            for (int j = 0; j < tableReader.FieldCount; j++)
+                            {
+                                table += tableReader.GetValue(j).ToString();
+                            }
+
+                            schemasTreeView.Nodes[i].Nodes.Add(table);
+                        }
+                        tableReader.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Failed to update treeview: No open SQL connection.");
+            }
+        }
+
         private void SQueLchForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Conn?.Close();
+        }
+
+        private void updateSchemasBtn_Click(object sender, EventArgs e)
+        {
+            UpdateSchemaTree();
         }
     }
 }
