@@ -36,6 +36,7 @@
             this.consoleLbl = new System.Windows.Forms.Label();
             this.outputTbx = new System.Windows.Forms.TextBox();
             this.outputLbl = new System.Windows.Forms.Label();
+            this.resultsLbl = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.resultDGV)).BeginInit();
             this.SuspendLayout();
             // 
@@ -107,11 +108,21 @@
             this.outputLbl.TabIndex = 8;
             this.outputLbl.Text = "Output";
             // 
+            // resultsLbl
+            // 
+            this.resultsLbl.AutoSize = true;
+            this.resultsLbl.Location = new System.Drawing.Point(221, 12);
+            this.resultsLbl.Name = "resultsLbl";
+            this.resultsLbl.Size = new System.Drawing.Size(42, 13);
+            this.resultsLbl.TabIndex = 9;
+            this.resultsLbl.Text = "Results";
+            // 
             // SQueLchForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(745, 524);
+            this.Controls.Add(this.resultsLbl);
             this.Controls.Add(this.outputLbl);
             this.Controls.Add(this.outputTbx);
             this.Controls.Add(this.consoleLbl);
@@ -140,6 +151,7 @@
         private System.Windows.Forms.Label consoleLbl;
         private System.Windows.Forms.TextBox outputTbx;
         private System.Windows.Forms.Label outputLbl;
+        private System.Windows.Forms.Label resultsLbl;
     }
 }
 
