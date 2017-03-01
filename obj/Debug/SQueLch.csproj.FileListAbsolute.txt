@@ -10,3 +10,4 @@ D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\obj\Debug\SQueLch.Propert
 D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\obj\Debug\SQueLch.csproj.GenerateResource.Cache
 D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\obj\Debug\SQueLch.exe
 D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\obj\Debug\SQueLch.pdb
+D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\obj\Debug\SQueLch.csprojResolveAssemblyReference.cache

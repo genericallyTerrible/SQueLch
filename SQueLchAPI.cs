@@ -161,7 +161,7 @@ namespace SQueLch
                 {
                     result = "";
                     for (int i = 0; i < queryReader.FieldCount; i++)
-                        result += queryReader.GetValue(i).ToString();
+                        result += queryReader.GetValue(i).ToString() + " ";
 
                     results.Add(result);
                 }
