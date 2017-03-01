@@ -297,7 +297,7 @@ namespace SQueLch
             }
         }
 
-        //Recursively collect all expanded nodes of a tree
+        //Recursively collects all expanded nodes of a tree
         private List<string> CollectExpandedNodes(TreeNodeCollection nodes)
         {
             List<string> expandedNodes = new List<string>();
@@ -311,7 +311,7 @@ namespace SQueLch
             return expandedNodes;
         }
 
-        //Recursively find a given node by name
+        //Recursively finds a given node by name
         private TreeNode FindNodeByName(TreeNodeCollection nodes, string Name)
         {
             TreeNode returnNode = null;
@@ -328,7 +328,7 @@ namespace SQueLch
             return null;
         }
 
-        //Recursively restore expanded nodes
+        //Recursively restores expanded nodes
         private void ExpandNodePath(TreeNode node)
         {
             if (node == null) return;
