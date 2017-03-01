@@ -30,13 +30,13 @@
         {
             this.schemasTree = new System.Windows.Forms.TreeView();
             this.schemaLbl = new System.Windows.Forms.Label();
-            this.updateSchemasBtn = new System.Windows.Forms.Button();
             this.resultDGV = new System.Windows.Forms.DataGridView();
             this.consoleTbx = new System.Windows.Forms.TextBox();
             this.consoleLbl = new System.Windows.Forms.Label();
             this.outputTbx = new System.Windows.Forms.TextBox();
             this.outputLbl = new System.Windows.Forms.Label();
             this.resultsLbl = new System.Windows.Forms.Label();
+            this.updateSchemasBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.resultDGV)).BeginInit();
             this.SuspendLayout();
             // 
@@ -46,6 +46,7 @@
             this.schemasTree.Name = "schemasTree";
             this.schemasTree.Size = new System.Drawing.Size(202, 258);
             this.schemasTree.TabIndex = 0;
+            this.schemasTree.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.SchemasTree_BeforeExpand);
             this.schemasTree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.SchemasTree_NodeMouseDoubleClick);
             // 
             // schemaLbl
@@ -56,16 +57,6 @@
             this.schemaLbl.Size = new System.Drawing.Size(51, 13);
             this.schemaLbl.TabIndex = 1;
             this.schemaLbl.Text = "Schemas";
-            // 
-            // updateSchemasBtn
-            // 
-            this.updateSchemasBtn.Location = new System.Drawing.Point(13, 293);
-            this.updateSchemasBtn.Name = "updateSchemasBtn";
-            this.updateSchemasBtn.Size = new System.Drawing.Size(202, 23);
-            this.updateSchemasBtn.TabIndex = 2;
-            this.updateSchemasBtn.Text = "Update Schemas";
-            this.updateSchemasBtn.UseVisualStyleBackColor = true;
-            this.updateSchemasBtn.Click += new System.EventHandler(this.UpdateSchemasBtn_Click);
             // 
             // resultDGV
             // 
@@ -123,6 +114,16 @@
             this.resultsLbl.TabIndex = 9;
             this.resultsLbl.Text = "Results";
             // 
+            // updateSchemasBtn
+            // 
+            this.updateSchemasBtn.Location = new System.Drawing.Point(13, 293);
+            this.updateSchemasBtn.Name = "updateSchemasBtn";
+            this.updateSchemasBtn.Size = new System.Drawing.Size(202, 23);
+            this.updateSchemasBtn.TabIndex = 2;
+            this.updateSchemasBtn.Text = "Update Schemas";
+            this.updateSchemasBtn.UseVisualStyleBackColor = true;
+            this.updateSchemasBtn.Click += new System.EventHandler(this.UpdateSchemasBtn_Click);
+            // 
             // SQueLchForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -151,13 +152,13 @@
 
         private System.Windows.Forms.TreeView schemasTree;
         private System.Windows.Forms.Label schemaLbl;
-        private System.Windows.Forms.Button updateSchemasBtn;
         private System.Windows.Forms.DataGridView resultDGV;
         private System.Windows.Forms.TextBox consoleTbx;
         private System.Windows.Forms.Label consoleLbl;
         private System.Windows.Forms.TextBox outputTbx;
         private System.Windows.Forms.Label outputLbl;
         private System.Windows.Forms.Label resultsLbl;
+        private System.Windows.Forms.Button updateSchemasBtn;
     }
 }
 

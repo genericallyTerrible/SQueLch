@@ -7,12 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace SQueLch
 {
     class SQueLchAPI
     {
         private MySqlConnection connection;
+        private TreeNode selectedDb;
+
+        private TreeNode SelectedDb { get => selectedDb; set => selectedDb = value; }
 
         public SQueLchAPI()
         {
@@ -39,13 +43,14 @@ namespace SQueLch
         {
             connection.Close();
         }
-
+        [Obsolete("GenerateFullTree is deprecated, please use GenerateDatabases, GenerateTables, and GenerateColumns instead.")]
         public TreeView GenerateTree()
         {
-            return GenerateTree(new TreeView());
+            return GenerateFullTree(new TreeView());
         }
 
-        public TreeView GenerateTree(TreeView tv)
+        [Obsolete("GenerateFullTree is deprecated, please use GenerateDatabases, GenerateTables, and GenerateColumns instead.")]
+        public TreeView GenerateFullTree(TreeView tv)
         {
             tv.BeginUpdate();
             tv.Nodes.Clear();
@@ -78,6 +83,93 @@ namespace SQueLch
                         tableNode.Nodes.Add(columnNode);
                     }
                 }
+            }
+
+            tv.EndUpdate();
+            return tv;
+        }
+
+        public string GetSelectedDatabaseName()
+        {
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT DATABASE();";
+            MySqlDataReader dbReader = cmd.ExecuteReader();
+            string database = "";
+
+            while (dbReader.Read())
+            {
+                database = dbReader.GetValue(0).ToString();
+            }
+            dbReader.Close();
+
+            return database;
+        }
+
+        public TreeView GenerateDatabases(TreeView tv)
+        {
+            tv.BeginUpdate();
+
+            List<string> expandedNodes = CollectExpandedNodes(tv.Nodes);
+            tv.Nodes.Clear();
+
+            List<string> dbs = Databases();
+            string selectedDb = SelectedDb?.Text ?? "";
+            foreach (string db in dbs)
+            {
+                TreeNode dbNode = new TreeNode()
+                {
+                    Text = db,
+                    Name = db
+                };
+                tv.Nodes.Add(dbNode);
+                dbNode.Nodes.Add("");
+                if (dbNode.Text == selectedDb)
+                {
+                    dbNode.NodeFont = new Font(tv.Font, FontStyle.Bold);
+                }
+            }
+
+            RestoreExpandedNodes(tv, expandedNodes);
+
+            tv.EndUpdate();
+            return tv;
+            }
+
+        public TreeView GenerateTables(TreeView tv, TreeNode database)
+        {
+            tv.BeginUpdate();
+            database.Nodes.Clear();
+
+            List<string> tables = Tables(database.Text);
+            foreach (string table in tables)
+            {
+                TreeNode tableNode = new TreeNode()
+                {
+                    Text = table,
+                    Name = table
+                };
+                database.Nodes.Add(tableNode);
+                tableNode.Nodes.Add("");
+            }
+
+            tv.EndUpdate();
+            return tv;
+        }
+
+        public TreeView GenerateColumns(TreeView tv, TreeNode table)
+        {
+            tv.BeginUpdate();
+            table.Nodes.Clear();
+
+            List<string> columns = Columns( table.Parent.Text, table.Text);
+            foreach (string column in columns)
+            {
+                TreeNode columnNode = new TreeNode()
+                {
+                    Text = column,
+                    Name = column
+                };
+                table.Nodes.Add(columnNode);
             }
 
             tv.EndUpdate();
@@ -151,12 +243,10 @@ namespace SQueLch
             List<string> results = new List<string>();
             try
             {
-
                 MySqlCommand cmd = connection.CreateCommand();
                 cmd.CommandText = query;
                 MySqlDataReader queryReader = cmd.ExecuteReader();
                 string result;
-
                 while (queryReader.Read())
                 {
                     result = "";
@@ -176,11 +266,79 @@ namespace SQueLch
             return results;
         }
 
-        public void UseDatabase(string db)
+        public void SelectDatabase(TreeNode db)
         {
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "USE " + db;
+            cmd.CommandText = "USE " + db.Text;
             cmd.ExecuteNonQuery();
+
+            if (SelectedDb != null)
+            {
+                SelectedDb.NodeFont = new Font(new TreeView().Font, FontStyle.Regular);
+            }
+            SelectedDb = db;
+            SelectedDb.NodeFont = new Font(new TreeView().Font, FontStyle.Bold);
+            //Forces the text to be redrawn to prevent clipping
+            SelectedDb.Text = SelectedDb.Text;
+        }
+
+        //Resotres nodes that were expanded
+        private void RestoreExpandedNodes(TreeView tv, List<string> expandedNodes)
+        {
+            if (expandedNodes.Count > 0)
+            {
+                TreeNode node;
+                for (int i = 0; i < expandedNodes.Count; i++)
+                {
+                    node = FindNodeByName(tv.Nodes, expandedNodes[i]);
+                    ExpandNodePath(node);
+                }
+
+            }
+        }
+
+        //Recursively collect all expanded nodes of a tree
+        private List<string> CollectExpandedNodes(TreeNodeCollection nodes)
+        {
+            List<string> expandedNodes = new List<string>();
+            foreach (TreeNode node in nodes)
+            {
+                if (node.IsExpanded)
+                    expandedNodes.Add(node.Name);
+                if (node.Nodes.Count > 0)
+                    expandedNodes.AddRange(CollectExpandedNodes(node.Nodes));
+            }
+            return expandedNodes;
+        }
+
+        //Recursively find a given node by name
+        private TreeNode FindNodeByName(TreeNodeCollection nodes, string Name)
+        {
+            TreeNode returnNode = null;
+            foreach (TreeNode node in nodes)
+            {
+                if (node.Name == Name)
+                    return node;
+                else if (node.Nodes.Count > 0)
+                    returnNode = FindNodeByName(node.Nodes, Name);
+
+                if (returnNode != null) return returnNode;
+
+            }
+            return null;
+        }
+
+        //Recursively restore expanded nodes
+        private void ExpandNodePath(TreeNode node)
+        {
+            if (node == null) return;
+            if (node.Level != 0)
+            {
+                node.Expand();
+                ExpandNodePath(node.Parent);
+            }
+            else node.Expand();
+
         }
     }
 }

@@ -17,10 +17,8 @@ namespace SQueLch
 
         private MySqlConnection conn;
         private SQueLchAPI sqlAPI;
-        private TreeNode selectedDB;
 
         public MySqlConnection Conn { get => conn;       protected set => conn       = value; }
-        public TreeNode SelectedDB  { get => selectedDB; protected set => selectedDB = value; }
 
         public SQueLchForm()
         {
@@ -38,7 +36,7 @@ namespace SQueLch
             {
                 bool success = sqlAPI.Connect(connectForm.ConnectionString);
                 if (success)
-                    sqlAPI.GenerateTree(schemasTree);
+                    sqlAPI.GenerateDatabases(schemasTree);
             }
             else
             {
@@ -49,13 +47,6 @@ namespace SQueLch
         private void SQueLchForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             sqlAPI.Disconnect();
-        }
-
-        private void UpdateSchemasBtn_Click(object sender, EventArgs e)
-        {
-            updateSchemasBtn.Enabled = false;
-            sqlAPI.GenerateTree(schemasTree);
-            updateSchemasBtn.Enabled = true;
         }
 
         private void ConsoleTbx_KeyDown(object sender, KeyEventArgs e)
@@ -72,7 +63,7 @@ namespace SQueLch
                         outputTbx.AppendText(result);
                         outputTbx.AppendText(Environment.NewLine);
                     }
-                    sqlAPI.GenerateTree(schemasTree);
+                    sqlAPI.GenerateDatabases(schemasTree);
                 }
 
                 if (e.KeyCode == Keys.Back)
@@ -101,16 +92,32 @@ namespace SQueLch
             while (tn.Parent != null)
                 tn = tn.Parent;
 
-            sqlAPI.UseDatabase(tn.Text);
+            sqlAPI.SelectDatabase(tn);
+        }
 
-            if (SelectedDB != null)
+        private void SchemasTree_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        {
+            TreeView tv = (TreeView)sender;
+            TreeNode tn = e.Node;
+            if (tn.Parent == null)
             {
-                SelectedDB.NodeFont = new Font(tv.Font, FontStyle.Regular);
+                //No parent, therefore it is a db being expanded
+                sqlAPI.GenerateTables(tv, tn);
             }
+            else
+            {
+                //Has a parent, therefore is a table being expanded
+                sqlAPI.GenerateColumns(tv, tn);
+            }
+        }
 
-            SelectedDB = tn;
-            SelectedDB.NodeFont = new Font(tv.Font, FontStyle.Bold);
-            tv.Update();
+        private void UpdateSchemasBtn_Click(object sender, EventArgs e)
+        {
+            updateSchemasBtn.Enabled = false;
+
+            sqlAPI.GenerateDatabases(schemasTree);
+
+            updateSchemasBtn.Enabled = true;
         }
     }
 }
