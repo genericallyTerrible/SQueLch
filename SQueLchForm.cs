@@ -88,16 +88,6 @@ namespace SQueLch
             }
         }
 
-        private void SchemasTree_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
-        {
-            TreeView tv = (TreeView)sender;
-            TreeNode tn = e.Node;
-            while (tn.Parent != null)
-                tn = tn.Parent;
-
-            sqlAPI.SelectDatabase(schemasTree, tn);
-        }
-
         private void SchemasTree_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             TreeView tv = (TreeView)sender;
@@ -121,6 +111,19 @@ namespace SQueLch
             sqlAPI.GenerateDatabases(schemasTree);
 
             updateSchemasBtn.Enabled = true;
+        }
+
+        private void SchemasTree_KeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+            {
+                TreeView tv = (TreeView)sender;
+                TreeNode tn = tv.SelectedNode;
+                while (tn.Parent != null)
+                    tn = tn.Parent;
+
+                sqlAPI.SelectDatabase(schemasTree, tn);
+            }
         }
     }
 }

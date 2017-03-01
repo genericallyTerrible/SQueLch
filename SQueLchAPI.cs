@@ -43,6 +43,7 @@ namespace SQueLch
         {
             connection.Close();
         }
+
         [Obsolete("GenerateFullTree is deprecated, please use GenerateDatabases, GenerateTables, and GenerateColumns instead.")]
         public TreeView GenerateTree()
         {
@@ -227,7 +228,6 @@ namespace SQueLch
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "SHOW COLUMNS FROM " + db + "." + table;
             MySqlDataReader columnReader = cmd.ExecuteReader();
-            string column;
 
             while (columnReader.Read())
             {
@@ -271,17 +271,21 @@ namespace SQueLch
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "USE " + db.Text;
             cmd.ExecuteNonQuery();
-
+            tv.BeginUpdate();
             if (SelectedDb != null)
             {
-                SelectedDb = FindNodeByName(tv.Nodes, SelectedDb.Name);
+                //Finds previously selected Node by name to avoid Node-TreeView dissociation
+                //Does not traverse child nodes since databases are at the root level
+                SelectedDb = FindNodeByName(tv.Nodes, SelectedDb.Name, false);
                 SelectedDb.NodeFont = new Font(SelectedDb.NodeFont, FontStyle.Regular);
+                //Forces the text to be redrawn to prevent clipping
                 SelectedDb.Text = SelectedDb.Text;
             }
             SelectedDb = db;
             SelectedDb.NodeFont = new Font(new TreeView().Font, FontStyle.Bold);
             //Forces the text to be redrawn to prevent clipping
             SelectedDb.Text = SelectedDb.Text;
+            tv.EndUpdate();
         }
 
         //Resotres nodes that were expanded
@@ -293,7 +297,7 @@ namespace SQueLch
                 TreeNode node;
                 for (int i = 0; i < expandedNodes.Count; i++)
                 {
-                    node = FindNodeByName(tv.Nodes, expandedNodes[i]);
+                    node = FindNodeByName(tv.Nodes, expandedNodes[i], true);
                     ExpandNodePath(node);
                 }
                 tv.EndUpdate();
@@ -315,18 +319,24 @@ namespace SQueLch
         }
 
         //Recursively finds a given node by name
-        private TreeNode FindNodeByName(TreeNodeCollection nodes, string Name)
+        private TreeNode FindNodeByName(TreeNodeCollection nodes, string name, bool traverseChildNodes)
         {
             TreeNode returnNode = null;
             foreach (TreeNode node in nodes)
             {
-                if (node.Name == Name)
+                if (node.Name == name)
+                {
                     return node;
-                else if (node.Nodes.Count > 0)
-                    returnNode = FindNodeByName(node.Nodes, Name);
+                }
+                else if (traverseChildNodes && node.Nodes.Count > 0)
+                {
+                    returnNode = FindNodeByName(node.Nodes, name, true);
+                }
 
-                if (returnNode != null) return returnNode;
-
+                if (returnNode != null)
+                {
+                    return returnNode;
+                }
             }
             return null;
         }

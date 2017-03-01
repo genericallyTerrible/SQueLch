@@ -47,7 +47,7 @@
             this.schemasTree.Size = new System.Drawing.Size(202, 258);
             this.schemasTree.TabIndex = 0;
             this.schemasTree.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.SchemasTree_BeforeExpand);
-            this.schemasTree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.SchemasTree_NodeMouseDoubleClick);
+            this.schemasTree.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SchemasTree_KeyDown);
             // 
             // schemaLbl
             // 
