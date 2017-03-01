@@ -96,6 +96,7 @@
             // 
             // outputTbx
             // 
+            this.outputTbx.Enabled = false;
             this.outputTbx.Location = new System.Drawing.Point(376, 335);
             this.outputTbx.Multiline = true;
             this.outputTbx.Name = "outputTbx";
