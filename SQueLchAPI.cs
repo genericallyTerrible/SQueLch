@@ -113,7 +113,7 @@ namespace SQueLch
             tv.Nodes.Clear();
 
             List<string> dbs = Databases();
-            string selectedDb = SelectedDb?.Text ?? "";
+            string selectedDb = SelectedDb?.Name ?? "";
             foreach (string db in dbs)
             {
                 TreeNode dbNode = new TreeNode()
@@ -123,7 +123,7 @@ namespace SQueLch
                 };
                 tv.Nodes.Add(dbNode);
                 dbNode.Nodes.Add("");
-                if (dbNode.Text == selectedDb)
+                if (dbNode.Name == selectedDb)
                 {
                     dbNode.NodeFont = new Font(tv.Font, FontStyle.Bold);
                 }
@@ -266,7 +266,7 @@ namespace SQueLch
             return results;
         }
 
-        public void SelectDatabase(TreeNode db)
+        public void SelectDatabase(TreeView tv, TreeNode db)
         {
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "USE " + db.Text;
@@ -274,7 +274,9 @@ namespace SQueLch
 
             if (SelectedDb != null)
             {
-                SelectedDb.NodeFont = new Font(new TreeView().Font, FontStyle.Regular);
+                SelectedDb = FindNodeByName(tv.Nodes, SelectedDb.Name);
+                SelectedDb.NodeFont = new Font(SelectedDb.NodeFont, FontStyle.Regular);
+                SelectedDb.Text = SelectedDb.Text;
             }
             SelectedDb = db;
             SelectedDb.NodeFont = new Font(new TreeView().Font, FontStyle.Bold);
@@ -287,13 +289,14 @@ namespace SQueLch
         {
             if (expandedNodes.Count > 0)
             {
+                tv.BeginUpdate();
                 TreeNode node;
                 for (int i = 0; i < expandedNodes.Count; i++)
                 {
                     node = FindNodeByName(tv.Nodes, expandedNodes[i]);
                     ExpandNodePath(node);
                 }
-
+                tv.EndUpdate();
             }
         }
 

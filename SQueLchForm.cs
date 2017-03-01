@@ -98,7 +98,7 @@ namespace SQueLch
             while (tn.Parent != null)
                 tn = tn.Parent;
 
-            sqlAPI.SelectDatabase(tn);
+            sqlAPI.SelectDatabase(schemasTree, tn);
         }
 
         private void SchemasTree_BeforeExpand(object sender, TreeViewCancelEventArgs e)
