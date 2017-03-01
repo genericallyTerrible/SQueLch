@@ -82,6 +82,12 @@ namespace SQueLch
                     ((TextBox)sender).Select(prevSpacePos + 1, ((TextBox)sender).SelectionStart - prevSpacePos - 1);
                     ((TextBox)sender).SelectedText = "";
                 }
+
+                if ((e.KeyCode == Keys.A))
+                {
+                    e.SuppressKeyPress = true;
+                    ((TextBox)sender).SelectAll();
+                }
             }
         }
 
