@@ -1,0 +1,6 @@
+CREATE SCHEMA `test`
+
+CREATE TABLE `test`.`test_table` (
+  `id` INT NOT NULL,
+  `test` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`));

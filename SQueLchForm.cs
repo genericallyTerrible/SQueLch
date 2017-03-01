@@ -72,6 +72,24 @@ namespace SQueLch
                         outputTbx.AppendText(result);
                         outputTbx.AppendText(Environment.NewLine);
                     }
+                    sqlAPI.GenerateTree(schemasTree);
+                }
+
+                if (e.KeyCode == Keys.Back)
+                {
+                    e.SuppressKeyPress = true;
+                    int selStart = ((TextBox)sender).SelectionStart;
+                    while (selStart > 0 && ((TextBox)sender).Text.Substring(selStart - 1, 1) == " ")
+                    {
+                        selStart--;
+                    }
+                    int prevSpacePos = -1;
+                    if (selStart != 0)
+                    {
+                        prevSpacePos = ((TextBox)sender).Text.LastIndexOf(' ', selStart - 1);
+                    }
+                    ((TextBox)sender).Select(prevSpacePos + 1, ((TextBox)sender).SelectionStart - prevSpacePos - 1);
+                    ((TextBox)sender).SelectedText = "";
                 }
             }
         }

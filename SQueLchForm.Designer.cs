@@ -96,10 +96,10 @@
             // 
             // outputTbx
             // 
-            this.outputTbx.Enabled = false;
             this.outputTbx.Location = new System.Drawing.Point(376, 335);
             this.outputTbx.Multiline = true;
             this.outputTbx.Name = "outputTbx";
+            this.outputTbx.ReadOnly = true;
             this.outputTbx.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.outputTbx.Size = new System.Drawing.Size(357, 177);
             this.outputTbx.TabIndex = 7;
