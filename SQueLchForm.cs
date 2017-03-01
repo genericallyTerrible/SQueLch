@@ -14,16 +14,11 @@ namespace SQueLch
 {
     public partial class SQueLchForm : Form
     {
-
-        private MySqlConnection conn;
         private SQueLchAPI sqlAPI;
-
-        public MySqlConnection Conn { get => conn;       protected set => conn       = value; }
 
         public SQueLchForm()
         {
             InitializeComponent();
-            Conn = new MySqlConnection();
             sqlAPI = new SQueLchAPI();
         }
 
@@ -37,6 +32,8 @@ namespace SQueLch
                 bool success = sqlAPI.Connect(connectForm.ConnectionString);
                 if (success)
                     sqlAPI.GenerateDatabases(schemasTree);
+                else
+                    outputTbx.AppendText("ERROR: Failed to connect to server");
             }
             else
             {
