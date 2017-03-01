@@ -171,6 +171,7 @@ namespace SQueLch
             catch (Exception ex)
             {
                 results.Add("ERROR: " + ex.Message);
+                results.Add(ex.ToString());
             }
             return results;
         }
