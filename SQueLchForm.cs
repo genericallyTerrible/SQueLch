@@ -17,8 +17,10 @@ namespace SQueLch
 
         private MySqlConnection conn;
         private SQueLchAPI sqlAPI;
+        private TreeNode selectedDB;
 
-        public MySqlConnection Conn { get => conn; protected set => conn = value; }
+        public MySqlConnection Conn { get => conn;       protected set => conn       = value; }
+        public TreeNode SelectedDB  { get => selectedDB; protected set => selectedDB = value; }
 
         public SQueLchForm()
         {
@@ -46,13 +48,51 @@ namespace SQueLch
 
         private void SQueLchForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            
+            sqlAPI.Disconnect();
         }
 
-        private void updateSchemasBtn_Click(object sender, EventArgs e)
+        private void UpdateSchemasBtn_Click(object sender, EventArgs e)
         {
+            updateSchemasBtn.Enabled = false;
             sqlAPI.GenerateTree(schemasTree);
-            //UpdateSchemaTree();
+            updateSchemasBtn.Enabled = true;
+        }
+
+        private void ConsoleTbx_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Control)
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    e.SuppressKeyPress = true;
+
+                    List<string> results = sqlAPI.Query(consoleTbx.Text);
+                    foreach (string result in results)
+                    {
+                        outputTbx.AppendText(result);
+                        outputTbx.AppendText(Environment.NewLine);
+                    }
+                }
+            }
+        }
+
+        private void SchemasTree_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            TreeView tv = (TreeView)sender;
+            TreeNode tn = e.Node;
+            while (tn.Parent != null)
+                tn = tn.Parent;
+
+            sqlAPI.UseDatabase(tn.Text);
+
+            if (SelectedDB != null)
+            {
+                SelectedDB.NodeFont = new Font(tv.Font, FontStyle.Regular);
+            }
+
+            SelectedDB = tn;
+            SelectedDB.NodeFont = new Font(tv.Font, FontStyle.Bold);
+            tv.Update();
         }
     }
 }

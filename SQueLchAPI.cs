@@ -53,20 +53,30 @@ namespace SQueLch
             List<string> dbs = Databases();
             foreach (string db in dbs)
             {
-                TreeNode parent = new TreeNode()
+                TreeNode dbNode = new TreeNode()
                 {
                     Text = db
                 };
-                tv.Nodes.Add(parent);
+                tv.Nodes.Add(dbNode);
 
                 List<string> tables = Tables(db);
                 foreach (string table in tables)
                 {
-                    TreeNode child = new TreeNode()
+                    TreeNode tableNode = new TreeNode()
                     {
                         Text = table
                     };
-                    parent.Nodes.Add(child);
+                    dbNode.Nodes.Add(tableNode);
+
+                    List<string> columns = Columns(db, table);
+                    foreach (string column in columns)
+                    {
+                        TreeNode columnNode = new TreeNode()
+                        {
+                            Text = column
+                        };
+                        tableNode.Nodes.Add(columnNode);
+                    }
                 }
             }
 
@@ -101,7 +111,7 @@ namespace SQueLch
             List<string> tables = new List<string>();
 
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SHOW TABLES IN " + database; ;
+            cmd.CommandText = "SHOW TABLES IN " + database;
             MySqlDataReader tableReader = cmd.ExecuteReader();
             string table;
 
@@ -116,6 +126,60 @@ namespace SQueLch
             tableReader.Close();
 
             return tables;
+        }
+
+        private List<string> Columns(string db, string table)
+        {
+            List<string> columns = new List<string>();
+
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SHOW COLUMNS FROM " + db + "." + table;
+            MySqlDataReader columnReader = cmd.ExecuteReader();
+            string column;
+
+            while (columnReader.Read())
+            {
+                columns.Add(columnReader.GetValue(0).ToString());
+            }
+            columnReader.Close();
+
+            return columns;
+        }
+
+        public List<string> Query(string query)
+        {
+            List<string> results = new List<string>();
+            try
+            {
+
+                MySqlCommand cmd = connection.CreateCommand();
+                cmd.CommandText = query;
+                MySqlDataReader queryReader = cmd.ExecuteReader();
+                string result;
+
+                while (queryReader.Read())
+                {
+                    result = "";
+                    for (int i = 0; i < queryReader.FieldCount; i++)
+                        result += queryReader.GetValue(i).ToString();
+
+                    results.Add(result);
+                }
+                queryReader.Close();
+
+            }
+            catch (Exception ex)
+            {
+                results.Add("ERROR: " + ex.Message);
+            }
+            return results;
+        }
+
+        public void UseDatabase(string db)
+        {
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "USE " + db;
+            cmd.ExecuteNonQuery();
         }
     }
 }

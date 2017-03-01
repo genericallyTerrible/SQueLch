@@ -46,6 +46,7 @@
             this.schemasTree.Name = "schemasTree";
             this.schemasTree.Size = new System.Drawing.Size(202, 258);
             this.schemasTree.TabIndex = 0;
+            this.schemasTree.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.SchemasTree_NodeMouseDoubleClick);
             // 
             // schemaLbl
             // 
@@ -64,7 +65,7 @@
             this.updateSchemasBtn.TabIndex = 2;
             this.updateSchemasBtn.Text = "Update Schemas";
             this.updateSchemasBtn.UseVisualStyleBackColor = true;
-            this.updateSchemasBtn.Click += new System.EventHandler(this.updateSchemasBtn_Click);
+            this.updateSchemasBtn.Click += new System.EventHandler(this.UpdateSchemasBtn_Click);
             // 
             // resultDGV
             // 
@@ -81,6 +82,8 @@
             this.consoleTbx.Name = "consoleTbx";
             this.consoleTbx.Size = new System.Drawing.Size(357, 177);
             this.consoleTbx.TabIndex = 5;
+            this.consoleTbx.WordWrap = false;
+            this.consoleTbx.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ConsoleTbx_KeyDown);
             // 
             // consoleLbl
             // 
@@ -96,8 +99,10 @@
             this.outputTbx.Location = new System.Drawing.Point(376, 335);
             this.outputTbx.Multiline = true;
             this.outputTbx.Name = "outputTbx";
+            this.outputTbx.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.outputTbx.Size = new System.Drawing.Size(357, 177);
             this.outputTbx.TabIndex = 7;
+            this.outputTbx.WordWrap = false;
             // 
             // outputLbl
             // 
