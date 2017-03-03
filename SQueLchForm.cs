@@ -43,7 +43,7 @@ namespace SQueLch
 
         private void SQueLchForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            sqlAPI.Disconnect();
+            sqlAPI.Close();
         }
 
         private void ConsoleTbx_KeyDown(object sender, KeyEventArgs e)
@@ -54,10 +54,10 @@ namespace SQueLch
                 {
                     e.SuppressKeyPress = true;
 
-                    List<string> results = sqlAPI.Query(consoleTbx.Text);
-                    foreach (string result in results)
+                    List<List<string>> results = sqlAPI.Query(consoleTbx.Text);
+                    foreach (List<string> row in results)
                     {
-                        outputTbx.AppendText(result);
+                        outputTbx.AppendText(string.Join(",",row.ToArray()));
                         outputTbx.AppendText(Environment.NewLine);
                     }
                     sqlAPI.GenerateDatabases(schemasTree);
@@ -117,6 +117,7 @@ namespace SQueLch
         {
             if(e.KeyCode == Keys.Enter)
             {
+                e.SuppressKeyPress = true;
                 TreeView tv = (TreeView)sender;
                 TreeNode tn = tv.SelectedNode;
                 while (tn.Parent != null)

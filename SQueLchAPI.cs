@@ -11,7 +11,7 @@ using System.Drawing;
 
 namespace SQueLch
 {
-    class SQueLchAPI
+    class SQueLchAPI : IDisposable
     {
         private MySqlConnection connection;
         private TreeNode selectedDb;
@@ -37,11 +37,6 @@ namespace SQueLch
                 return false;
             }
             return connection.State == ConnectionState.Open;
-        }
-
-        public void Disconnect()
-        {
-            connection.Close();
         }
 
         [Obsolete("GenerateFullTree is deprecated, please use GenerateDatabases, GenerateTables, and GenerateColumns instead.")]
@@ -94,14 +89,15 @@ namespace SQueLch
         {
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT DATABASE();";
-            MySqlDataReader dbReader = cmd.ExecuteReader();
             string database = "";
 
-            while (dbReader.Read())
+            using (MySqlDataReader dbReader = cmd.ExecuteReader())
             {
-                database = dbReader.GetValue(0).ToString();
+                while (dbReader.Read())
+                {
+                    database = dbReader.GetValue(0).ToString();
+                }
             }
-            dbReader.Close();
 
             return database;
         }
@@ -134,7 +130,7 @@ namespace SQueLch
 
             tv.EndUpdate();
             return tv;
-            }
+        }
 
         public TreeView GenerateTables(TreeView tv, TreeNode database)
         {
@@ -162,7 +158,7 @@ namespace SQueLch
             tv.BeginUpdate();
             table.Nodes.Clear();
 
-            List<string> columns = Columns( table.Parent.Text, table.Text);
+            List<string> columns = Columns(table.Parent.Text, table.Text);
             foreach (string column in columns)
             {
                 TreeNode columnNode = new TreeNode()
@@ -183,18 +179,19 @@ namespace SQueLch
 
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "SHOW DATABASES";
-            MySqlDataReader dbReader = cmd.ExecuteReader();
             string database;
 
-            while (dbReader.Read())
+            using (MySqlDataReader dbReader = cmd.ExecuteReader())
             {
-                database = "";
-                for (int i = 0; i < dbReader.FieldCount; i++)
-                    database += dbReader.GetValue(i).ToString();
+                while (dbReader.Read())
+                {
+                    database = "";
+                    for (int i = 0; i < dbReader.FieldCount; i++)
+                        database += dbReader.GetValue(i).ToString();
 
-                databases.Add(database);
+                    databases.Add(database);
+                }
             }
-            dbReader.Close();
 
             return databases;
         }
@@ -205,19 +202,19 @@ namespace SQueLch
 
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "SHOW TABLES IN " + database;
-            MySqlDataReader tableReader = cmd.ExecuteReader();
             string table;
 
-            while (tableReader.Read())
+            using (MySqlDataReader tableReader = cmd.ExecuteReader())
             {
-                table = "";
-                for (int i = 0; i < tableReader.FieldCount; i++)
-                    table += tableReader.GetValue(i).ToString();
+                while (tableReader.Read())
+                {
+                    table = "";
+                    for (int i = 0; i < tableReader.FieldCount; i++)
+                        table += tableReader.GetValue(i).ToString();
 
-                tables.Add(table);
+                    tables.Add(table);
+                }
             }
-            tableReader.Close();
-
             return tables;
         }
 
@@ -227,41 +224,43 @@ namespace SQueLch
 
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "SHOW COLUMNS FROM " + db + "." + table;
-            MySqlDataReader columnReader = cmd.ExecuteReader();
 
-            while (columnReader.Read())
+            using (MySqlDataReader columnReader = cmd.ExecuteReader())
             {
-                columns.Add(columnReader.GetValue(0).ToString());
+                while (columnReader.Read())
+                {
+                    columns.Add(columnReader.GetValue(0).ToString());
+                }
             }
-            columnReader.Close();
 
             return columns;
         }
 
-        public List<string> Query(string query)
+        public List<List<string>> Query(string query)
         {
-            List<string> results = new List<string>();
+            List<List<string>> results = new List<List<string>>();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = query;
             try
             {
-                MySqlCommand cmd = connection.CreateCommand();
-                cmd.CommandText = query;
-                MySqlDataReader queryReader = cmd.ExecuteReader();
-                string result;
-                while (queryReader.Read())
+                using (MySqlDataReader queryReader = cmd.ExecuteReader())
                 {
-                    result = "";
-                    for (int i = 0; i < queryReader.FieldCount; i++)
-                        result += queryReader.GetValue(i).ToString() + " ";
+                    Object[] row = new Object[queryReader.FieldCount];
 
-                    results.Add(result);
+                    while (queryReader.Read())
+                    {
+                        queryReader.GetValues(row);
+                        results.Add(row.Cast<string>().ToList());
+                    }
                 }
-                queryReader.Close();
-
             }
             catch (Exception ex)
             {
-                results.Add("ERROR: " + ex.Message);
-                results.Add(ex.ToString());
+                results.Add(new List<string>
+                {
+                    "ERROR: " + ex.Message,
+                    ex.ToString()
+                });
             }
             return results;
         }
@@ -352,6 +351,16 @@ namespace SQueLch
             }
             else node.Expand();
 
+        }
+
+        public void Close()
+        {
+            connection.Close();
+        }
+
+        public void Dispose()
+        {
+            connection.Close();
         }
     }
 }
