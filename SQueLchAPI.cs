@@ -236,7 +236,27 @@ namespace SQueLch
             return columns;
         }
 
-        public List<List<string>> Query(string query)
+        public DataTable Query(string query)
+        {
+            DataTable dt = new DataTable();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = query;
+            try
+            {
+                using (MySqlDataReader queryReader = cmd.ExecuteReader())
+                {
+                    dt.Load(queryReader);
+                }
+            }
+            catch (Exception ex)
+            {
+                dt.Columns.Add("ErrorMessage", typeof(String));
+                dt.Rows.Add(new Object[] { ex.Message });
+            }
+            return dt;
+        }
+
+        public List<List<string>> QueryStr(string query)
         {
             List<List<string>> results = new List<List<string>>();
             MySqlCommand cmd = connection.CreateCommand();
@@ -263,8 +283,7 @@ namespace SQueLch
             {
                 results.Add(new List<string>
                 {
-                    "ERROR: " + ex.Message,
-                    ex.ToString()
+                    "ERROR: " + ex.ToString()
                 });
             }
             return results;

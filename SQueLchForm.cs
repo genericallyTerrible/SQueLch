@@ -53,13 +53,18 @@ namespace SQueLch
                 if (e.KeyCode == Keys.Enter)
                 {
                     e.SuppressKeyPress = true;
-                    
-                    List<List<string>> results = sqlAPI.Query(consoleTbx.Text);
-                    foreach (List<string> row in results)
-                    {
-                        outputTbx.AppendText(string.Join(",",row.ToArray()));
-                        outputTbx.AppendText(Environment.NewLine);
-                    }
+
+                    //List<List<string>> results = sqlAPI.Query(consoleTbx.Text);
+                    //foreach (List<string> row in results)
+                    //{
+                    //    outputTbx.AppendText(string.Join(",", row.ToArray()));
+                    //    outputTbx.AppendText(Environment.NewLine);
+                    //}
+
+                    DataTable dt = sqlAPI.Query(consoleTbx.Text);
+
+                    resultDGV.DataSource = dt;
+
                     sqlAPI.GenerateDatabases(schemasTree);
                 }
 
