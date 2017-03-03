@@ -53,7 +53,7 @@ namespace SQueLch
                 if (e.KeyCode == Keys.Enter)
                 {
                     e.SuppressKeyPress = true;
-
+                    
                     List<List<string>> results = sqlAPI.Query(consoleTbx.Text);
                     foreach (List<string> row in results)
                     {
@@ -117,13 +117,16 @@ namespace SQueLch
         {
             if(e.KeyCode == Keys.Enter)
             {
-                e.SuppressKeyPress = true;
                 TreeView tv = (TreeView)sender;
-                TreeNode tn = tv.SelectedNode;
-                while (tn.Parent != null)
-                    tn = tn.Parent;
+                if(tv.SelectedNode != null)
+                {
+                    e.SuppressKeyPress = true;
+                    TreeNode tn = tv.SelectedNode;
+                    while (tn.Parent != null)
+                        tn = tn.Parent;
 
-                sqlAPI.SelectDatabase(schemasTree, tn);
+                    sqlAPI.SelectDatabase(schemasTree, tn);
+                }
             }
         }
     }

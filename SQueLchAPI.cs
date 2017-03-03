@@ -245,12 +245,17 @@ namespace SQueLch
             {
                 using (MySqlDataReader queryReader = cmd.ExecuteReader())
                 {
-                    Object[] row = new Object[queryReader.FieldCount];
-
+                    Object[] resultRow = new Object[queryReader.FieldCount];
+                    List<string> columnNames = queryReader.GetSchemaTable()
+                                                          .Rows.Cast<DataRow>()
+                                                          .Select(row => row[0].ToString())
+                                                          .ToArray().ToList();
+                    results.Add(columnNames);
                     while (queryReader.Read())
                     {
-                        queryReader.GetValues(row);
-                        results.Add(row.Cast<string>().ToList());
+                        queryReader.GetValues(resultRow);
+                        List<string> str = resultRow.Select(i => Convert.ToString(i)).ToList();
+                        results.Add(str);
                     }
                 }
             }
