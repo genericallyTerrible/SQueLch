@@ -236,7 +236,45 @@ namespace SQueLch
             return columns;
         }
 
-        public DataTable Query(string query)
+        public Result Query(string query)
+        {
+            bool success = false;
+            DataTable dt = new DataTable();
+            string message = "";
+            int rowsAffected = 0;
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = query;
+            try
+            {
+                using (MySqlDataReader queryReader = cmd.ExecuteReader())
+                {
+                    dt.Load(queryReader);
+                    rowsAffected = queryReader.RecordsAffected;
+                    if(rowsAffected == -1) //It was a select statement
+                    {
+                        message = string.Format("{0} row(s) selected", dt.Rows.Count);
+                    }
+                    else
+                    {
+                        message = string.Format("{0} row(s) affected", rowsAffected);
+                    }
+                }
+                success = true;
+            }
+            catch (Exception ex)
+            {
+                message = ex.ToString();
+            }
+            Result result = new Result(
+                success,
+                dt,
+                query,
+                message
+                );
+            return result;
+        }
+
+        public DataTable QueryDT(string query)
         {
             DataTable dt = new DataTable();
             MySqlCommand cmd = connection.CreateCommand();

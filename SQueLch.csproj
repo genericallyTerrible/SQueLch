@@ -60,6 +60,7 @@
     <Compile Include="ConnectionForm.Designer.cs">
       <DependentUpon>ConnectionForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Result.cs" />
     <Compile Include="SQueLchAPI.cs" />
     <Compile Include="SQueLchForm.cs">
       <SubType>Form</SubType>

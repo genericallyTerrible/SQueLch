@@ -61,9 +61,14 @@ namespace SQueLch
                     //    outputTbx.AppendText(Environment.NewLine);
                     //}
 
-                    DataTable dt = sqlAPI.Query(consoleTbx.Text);
-
-                    resultDGV.DataSource = dt;
+                    //DataTable dt = sqlAPI.QueryDT(consoleTbx.Text);
+                    Result result = sqlAPI.Query(consoleTbx.Text);
+                    if (result.Success)
+                    {
+                        resultDGV.DataSource = result.ResultTable;
+                    }
+                    outputTbx.AppendText(result.Action + Environment.NewLine);
+                    outputTbx.AppendText(result.Message + Environment.NewLine);
 
                     sqlAPI.GenerateDatabases(schemasTree);
                 }
