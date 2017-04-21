@@ -72,7 +72,10 @@ namespace SQueLch
                 if (success)
                     sqlAPI.GenerateDatabases(schemasTree);
                 else
-                    outputTbx.AppendText("ERROR: Failed to connect to server");
+                {
+                    outputTbx.AppendText("ERROR: Failed to connect to server" + Environment.NewLine);
+                    outputTbx.AppendText("Use command \"!connect\" to try again." + Environment.NewLine);
+                }
             }
 
             return success;
