@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQueLch", "SQueLch.csproj", "{B6536E05-4264-47D3-9C91-1FD8A306C240}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{28F6628C-1677-4958-9A9F-23712BC2ED22}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\Photos\Meme\rettererDank.png = ..\..\Photos\Meme\rettererDank.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

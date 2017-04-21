@@ -11,3 +11,16 @@ D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\obj\Debug\SQueLch.csproj.
 D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\obj\Debug\SQueLch.exe
 D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\obj\Debug\SQueLch.pdb
 D:\Users\GenTer\Google Drive\Databases Midterm\SQueLch\obj\Debug\SQueLch.csprojResolveAssemblyReference.cache
+D:\Users\GenTer\Google Drive\Databases\SQueLch\bin\Debug\SQueLch.exe.config
+D:\Users\GenTer\Google Drive\Databases\SQueLch\bin\Debug\SQueLch.exe
+D:\Users\GenTer\Google Drive\Databases\SQueLch\bin\Debug\SQueLch.pdb
+D:\Users\GenTer\Google Drive\Databases\SQueLch\bin\Debug\IPAddressControlLib.dll
+D:\Users\GenTer\Google Drive\Databases\SQueLch\bin\Debug\MySql.Data.dll
+D:\Users\GenTer\Google Drive\Databases\SQueLch\bin\Debug\MySql.Data.xml
+D:\Users\GenTer\Google Drive\Databases\SQueLch\obj\Debug\SQueLch.csprojResolveAssemblyReference.cache
+D:\Users\GenTer\Google Drive\Databases\SQueLch\obj\Debug\SQueLch.ConnectionForm.resources
+D:\Users\GenTer\Google Drive\Databases\SQueLch\obj\Debug\SQueLch.SQueLchForm.resources
+D:\Users\GenTer\Google Drive\Databases\SQueLch\obj\Debug\SQueLch.Properties.Resources.resources
+D:\Users\GenTer\Google Drive\Databases\SQueLch\obj\Debug\SQueLch.csproj.GenerateResource.Cache
+D:\Users\GenTer\Google Drive\Databases\SQueLch\obj\Debug\SQueLch.exe
+D:\Users\GenTer\Google Drive\Databases\SQueLch\obj\Debug\SQueLch.pdb

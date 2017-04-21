@@ -14,8 +14,6 @@ namespace SQueLch
         public string Action { get => action; }
         public string Message { get => message; }
 
-        public Result() {}
-
         public Result(bool success, DataTable resultTable, string action, string message)
         {
             this.success = success;

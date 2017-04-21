@@ -8,39 +8,67 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace SQueLch
 {
     class SQueLchAPI : IDisposable
     {
-        private MySqlConnection connection;
-        private TreeNode selectedDb;
+        #region Maintaining TreeView scroll position
+        /* Source for maintaining TreeView scroll position: http://stackoverflow.com/a/359896 */
 
-        private TreeNode SelectedDb { get => selectedDb; set => selectedDb = value; }
+        [DllImport("user32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]
+        public static extern int GetScrollPos(int hWnd, int nBar);
+
+        [DllImport("user32.dll")]
+        static extern int SetScrollPos(IntPtr hWnd, int nBar, int nPos, bool bRedraw);
+
+        private const int SB_HORZ = 0x0;
+        private const int SB_VERT = 0x1;
+        #endregion
+        
+        private MySqlConnection connection;
+
+        private TreeNode selectedDb;
+        private TreeNode SelectedDb
+        {
+            get => selectedDb;
+            set => selectedDb = value;
+        }
+
+        public string SelectedDatabaseName
+        {
+            get
+            {
+                MySqlCommand cmd = connection.CreateCommand();
+                cmd.CommandText = "SELECT DATABASE();";
+                string database = "";
+                try
+                {
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        while (dbReader.Read())
+                        {
+                            database = dbReader.GetValue(0).ToString();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+                return database;
+            }
+        }
 
         public SQueLchAPI()
         {
             connection = new MySqlConnection();
         }
 
-        public bool Connect(string connectionString)
-        {
-            connection.ConnectionString = connectionString;
-
-            try
-            {
-                connection.Open();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return false;
-            }
-            return connection.State == ConnectionState.Open;
-        }
-
+        #region Depricated TreeView generation functions
         [Obsolete("GenerateFullTree is deprecated, please use GenerateDatabases, GenerateTables, and GenerateColumns instead.")]
-        public TreeView GenerateTree()
+        public TreeView GenerateNewTree()
         {
             return GenerateFullTree(new TreeView());
         }
@@ -84,51 +112,45 @@ namespace SQueLch
             tv.EndUpdate();
             return tv;
         }
+        #endregion
 
-        public string GetSelectedDatabaseName()
-        {
-            MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT DATABASE();";
-            string database = "";
-
-            using (MySqlDataReader dbReader = cmd.ExecuteReader())
-            {
-                while (dbReader.Read())
-                {
-                    database = dbReader.GetValue(0).ToString();
-                }
-            }
-
-            return database;
-        }
-
+        #region TreeView generation
         public TreeView GenerateDatabases(TreeView tv)
         {
+            Point scrollPos = GetTreeViewScrollPos(tv);
             tv.BeginUpdate();
-
             List<string> expandedNodes = CollectExpandedNodes(tv.Nodes);
             tv.Nodes.Clear();
 
             List<string> dbs = Databases();
-            string selectedDb = SelectedDb?.Name ?? "";
-            foreach (string db in dbs)
+
+            //If there is an open connection/are any databases
+            if (dbs.Count > 0)
             {
-                TreeNode dbNode = new TreeNode()
+                string selectedDb = SelectedDatabaseName; //SelectedDb?.Name ?? "";
+
+                foreach (string db in dbs)
                 {
-                    Text = db,
-                    Name = db
-                };
-                tv.Nodes.Add(dbNode);
-                dbNode.Nodes.Add("");
-                if (dbNode.Name == selectedDb)
-                {
-                    dbNode.NodeFont = new Font(tv.Font, FontStyle.Bold);
+                    TreeNode dbNode = new TreeNode()
+                    {
+                        Text = db,
+                        Name = db
+                    };
+                    tv.Nodes.Add(dbNode);
+                    dbNode.Nodes.Add("");
+                    if (dbNode.Name == selectedDb)
+                    {
+                        SelectedDb = dbNode;
+                        dbNode.NodeFont = new Font(tv.Font, FontStyle.Bold);
+                    }
                 }
             }
 
             RestoreExpandedNodes(tv, expandedNodes);
 
             tv.EndUpdate();
+            SetTreeViewScrollPos(tv, scrollPos);
+
             return tv;
         }
 
@@ -180,28 +202,34 @@ namespace SQueLch
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "SHOW DATABASES";
             string database;
-
-            using (MySqlDataReader dbReader = cmd.ExecuteReader())
+            try
             {
-                while (dbReader.Read())
+                using (MySqlDataReader dbReader = cmd.ExecuteReader())
                 {
-                    database = "";
-                    for (int i = 0; i < dbReader.FieldCount; i++)
-                        database += dbReader.GetValue(i).ToString();
+                    while (dbReader.Read())
+                    {
+                        database = "";
+                        for (int i = 0; i < dbReader.FieldCount; i++)
+                            database += dbReader.GetValue(i).ToString();
 
-                    databases.Add(database);
+                        databases.Add(database);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
             }
 
             return databases;
         }
 
-        private List<string> Tables(string database)
+        private List<string> Tables(string db)
         {
             List<string> tables = new List<string>();
 
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SHOW TABLES IN " + database;
+            cmd.CommandText = "SHOW TABLES IN " + db;
             string table;
 
             using (MySqlDataReader tableReader = cmd.ExecuteReader())
@@ -235,6 +263,27 @@ namespace SQueLch
 
             return columns;
         }
+        #endregion
+
+        #region MySQL Functions
+        public bool Connect(string connectionString)
+        {
+            //Close any possible existing connection
+            connection.Close();
+
+            connection.ConnectionString = connectionString;
+
+            try
+            {
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            return connection.State == ConnectionState.Open;
+        }
 
         public Result Query(string query)
         {
@@ -250,7 +299,7 @@ namespace SQueLch
                 {
                     dt.Load(queryReader);
                     rowsAffected = queryReader.RecordsAffected;
-                    if(rowsAffected == -1) //It was a select statement
+                    if (rowsAffected == -1) //It was a select statement
                     {
                         message = string.Format("{0} row(s) selected", dt.Rows.Count);
                     }
@@ -349,6 +398,11 @@ namespace SQueLch
             tv.EndUpdate();
         }
 
+        #endregion
+
+        #region Expanded TreeNode resoration
+        /* Source for restoring expanded TreeNodes: http://stackoverflow.com/a/14605609 */
+
         //Resotres nodes that were expanded
         private void RestoreExpandedNodes(TreeView tv, List<string> expandedNodes)
         {
@@ -414,7 +468,26 @@ namespace SQueLch
             else node.Expand();
 
         }
+        #endregion
 
+        #region Maintaining TreeView scroll position
+        /* Source for maintaining TreeView scroll position: http://stackoverflow.com/a/359896 */
+
+        private Point GetTreeViewScrollPos(TreeView tv)
+        {
+            return new Point(
+                GetScrollPos((int)tv.Handle, SB_HORZ),
+                GetScrollPos((int)tv.Handle, SB_VERT));
+        }
+
+        private void SetTreeViewScrollPos(TreeView tv, Point scrollPosition)
+        {
+            SetScrollPos((IntPtr)tv.Handle, SB_HORZ, scrollPosition.X, true);
+            SetScrollPos((IntPtr)tv.Handle, SB_VERT, scrollPosition.Y, true);
+        }
+        #endregion
+
+        #region Implementation of IDisposable
         public void Close()
         {
             connection.Close();
@@ -424,5 +497,6 @@ namespace SQueLch
         {
             connection.Close();
         }
+        #endregion
     }
 }

@@ -42,6 +42,7 @@
             // 
             // schemasTree
             // 
+            this.schemasTree.HideSelection = false;
             this.schemasTree.Location = new System.Drawing.Point(13, 29);
             this.schemasTree.Name = "schemasTree";
             this.schemasTree.Size = new System.Drawing.Size(202, 258);
@@ -69,6 +70,7 @@
             // 
             // consoleTbx
             // 
+            this.consoleTbx.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.consoleTbx.Location = new System.Drawing.Point(13, 335);
             this.consoleTbx.Multiline = true;
             this.consoleTbx.Name = "consoleTbx";
@@ -88,6 +90,7 @@
             // 
             // outputTbx
             // 
+            this.outputTbx.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.outputTbx.Location = new System.Drawing.Point(376, 335);
             this.outputTbx.Multiline = true;
             this.outputTbx.Name = "outputTbx";
@@ -139,7 +142,11 @@
             this.Controls.Add(this.updateSchemasBtn);
             this.Controls.Add(this.schemaLbl);
             this.Controls.Add(this.schemasTree);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "SQueLchForm";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "SQueLch";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SQueLchForm_FormClosing);
             this.Shown += new System.EventHandler(this.SQueLchForm_Shown);
