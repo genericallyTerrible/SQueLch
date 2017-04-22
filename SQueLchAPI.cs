@@ -387,9 +387,12 @@ namespace SQueLch
                 //Finds previously selected Node by name to avoid Node-TreeView dissociation
                 //Does not traverse child nodes since databases are at the root level
                 SelectedDb = FindNodeByName(tv.Nodes, SelectedDb.Name, false);
-                SelectedDb.NodeFont = new Font(SelectedDb.NodeFont, FontStyle.Regular);
-                //Forces the text to be redrawn to prevent clipping
-                SelectedDb.Text = SelectedDb.Text;
+                if (SelectedDb != null)
+                {
+                    SelectedDb.NodeFont = new Font(SelectedDb.NodeFont, FontStyle.Regular);
+                    SelectedDb.Text = SelectedDb.Text;
+                    //Forces the text to be redrawn to prevent clipping
+                }
             }
             SelectedDb = db;
             SelectedDb.NodeFont = new Font(new TreeView().Font, FontStyle.Bold);

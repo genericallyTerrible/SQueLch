@@ -15,7 +15,7 @@ namespace SQueLch
     {
         [XmlIgnore]
         public IPAddress ServerIP;
-        [XmlElement("serverIP")]
+        [XmlElement("ServerIP")]
         public string ServerIPForXml
         {
             get => ServerIP.ToString();
