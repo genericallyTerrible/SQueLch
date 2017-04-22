@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -6,13 +7,22 @@ namespace SQueLch
 {
     public partial class ConnectionForm : Form
     {
-        private String connectionString;
+        private ConnectionParameters connectionParams;
 
-        public string ConnectionString { get => connectionString; private set => connectionString = value; }
+        public ConnectionParameters ConnectionParams { get => connectionParams; private set => connectionParams = value; }
 
         public ConnectionForm()
         {
             InitializeComponent();
+        }
+
+        public ConnectionForm(ConnectionParameters connectParams)
+        {
+            InitializeComponent();
+            ipAddr.Text = connectParams.ServerIP.ToString();
+            portTB.Text = connectParams.Port.ToString();
+            usernameTB.Text = connectParams.UserID;
+            passwordTB.Text = connectParams.Password;
         }
 
         private void PortTB_TextChanged(object sender, EventArgs e)
@@ -56,13 +66,20 @@ namespace SQueLch
 
         private void OkBtn_Click(object sender, EventArgs e)
         {
-            ConnectionString = "server=" + ipAddr.IPAddress.ToString()
-                     + ";port="   + portTB.Text
-                     + ";uid="    + usernameTB.Text
-                     + ";pwd="    + passwordTB.Text
-                     + ";";
+            ConnectionParams = GenerateConnectionParams();
             DialogResult = DialogResult.OK;
             Dispose();
+        }
+
+        private ConnectionParameters GenerateConnectionParams()
+        {
+            return new ConnectionParameters()
+            {
+                ServerIP = ipAddr.IPAddress,
+                Port     = uint.Parse(portTB.Text),
+                UserID   = usernameTB.Text,
+                Password = passwordTB.Text
+            };
         }
     }
 }

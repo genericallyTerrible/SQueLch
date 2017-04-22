@@ -30,6 +30,8 @@ namespace SQueLch
             "updat"
         });
 
+        private string UserSettingsPath = Directory.GetCurrentDirectory() + "\\UserParameters.xml";
+
         public SQueLchForm()
         {
             InitializeComponent();
@@ -68,7 +70,7 @@ namespace SQueLch
 
             if (connectForm.DialogResult == DialogResult.OK)
             {
-                success = sqlAPI.Connect(connectForm.ConnectionString);
+                success = sqlAPI.Connect(connectForm.ConnectionParams.ToString());
                 if (success)
                     sqlAPI.GenerateDatabases(schemasTree);
                 else
@@ -81,6 +83,21 @@ namespace SQueLch
             return success;
         }
 
+        private bool Connect(string connectionString)
+        {
+            bool success = sqlAPI.Connect(connectionString);
+
+            if (success)
+                sqlAPI.GenerateDatabases(schemasTree);
+            else
+            {
+                outputTbx.AppendText("ERROR: Failed to connect to server" + Environment.NewLine);
+                outputTbx.AppendText("Use command \"!connect\" to try again." + Environment.NewLine);
+            }
+
+            return success;
+        }
+
         private void ConsoleTbx_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Control)
@@ -88,7 +105,6 @@ namespace SQueLch
                 //ctrl + enter
                 if (e.KeyCode == Keys.Enter)
                 {
-                    e.SuppressKeyPress = true;
                     string consoleText = consoleTbx.Text.Trim().ToLower();
 
                     //There is a command
@@ -121,10 +137,10 @@ namespace SQueLch
                                     else if (consoleSplit[1] == commands[2])
                                     {
                                         outputTbx.AppendText("Clears the contents of a specified container." + Environment.NewLine);
-                                        outputTbx.AppendText("\t-s: Clears all elements in the Schemas TreeView" + Environment.NewLine);
-                                        outputTbx.AppendText("\t-r: Clears all elements in the Results DataGridView" + Environment.NewLine);
-                                        outputTbx.AppendText("\t-o: Clears all elements in the Output TextBox" + Environment.NewLine);
                                         outputTbx.AppendText("\t-a: Clears all elements in bot the Output TextBox" + Environment.NewLine);
+                                        outputTbx.AppendText("\t-o: Clears all elements in the Output TextBox" + Environment.NewLine);
+                                        outputTbx.AppendText("\t-r: Clears all elements in the Results DataGridView" + Environment.NewLine);
+                                        outputTbx.AppendText("\t-s: Clears all elements in the Schemas TreeView" + Environment.NewLine);
                                         outputTbx.AppendText("\t    and the Results DataGridView" + Environment.NewLine);
                                     }
                                     //help with update
@@ -136,7 +152,10 @@ namespace SQueLch
                                     //help with connect
                                     else if (consoleSplit[1] == commands[4])
                                     {
-                                        outputTbx.AppendText("Shows the ConnectionForm to change connected databases." + Environment.NewLine);
+                                        outputTbx.AppendText("Used to change connected databases." + Environment.NewLine);
+                                        outputTbx.AppendText("\t-d: Attempts to connect to a local database with default credentials" + Environment.NewLine);
+                                        outputTbx.AppendText("\t-s: Prompts for user credentials to be saved for use with -u" + Environment.NewLine);
+                                        outputTbx.AppendText("\t-u: Attempts to connect to user specified database with user provided parameters" + Environment.NewLine);
                                     }
                                     //unrecognized command
                                     else
@@ -183,7 +202,42 @@ namespace SQueLch
                             //connect command
                             else if (consoleSplit[0].Equals(commands[4]))
                             {
-                                Connect();
+                                //Basic connect, show ConnectionForm
+                                if (consoleSplit.Count() == 1)
+                                {
+                                    BeginInvoke(new Action(() => Connect()));
+                                }
+                                //Connect with flags
+                                else
+                                {
+                                    switch (consoleSplit[1])
+                                    {
+                                        //attempt to connect using default localhost settings
+                                        case "-d":
+                                            Connect(ConnectionParameters.DefaultConnectionString());
+                                            break;
+                                        //attempt to connect using user settings
+                                        case "-u":
+                                            Connect(ConnectionParameters.Deserialize(UserSettingsPath).ToString());
+                                            break;
+                                        //save user settings
+                                        case "-s":
+                                            BeginInvoke(new Action(() =>
+                                            {
+                                                ConnectionForm connectForm = new ConnectionForm(ConnectionParameters.Deserialize(UserSettingsPath));
+
+                                                connectForm.ShowDialog();
+                                                if (connectForm.DialogResult == DialogResult.OK)
+                                                {
+                                                    ConnectionParameters cp = connectForm.ConnectionParams;
+                                                    cp.Serialize(UserSettingsPath);
+                                                    outputTbx.AppendText("Custom parameters written to:" + Environment.NewLine);
+                                                    outputTbx.AppendText(UserSettingsPath + Environment.NewLine);
+                                                }
+                                            }));
+                                            break;
+                                    }
+                                }
                             }
                             //it's a secret
                             else if (consoleSplit[0].Equals(commands[commands.Count - 1]))
@@ -191,26 +245,29 @@ namespace SQueLch
                                 if (consoleSplit.Count() == 2 && consoleSplit[1] == "-ass")
                                 {
                                     //Dankest of memes
-                                    using (Form form = new Form())
+                                    BeginInvoke(new Action(() =>
                                     {
-                                        Assembly myAssembly = Assembly.GetExecutingAssembly();
-                                        Stream myStream = myAssembly.GetManifestResourceStream("SQueLch.rettererDank.png");
-                                        if (myStream != null)
+                                        using (Form form = new Form())
                                         {
-                                            Bitmap img = new Bitmap(myStream);
-
-                                            form.StartPosition = FormStartPosition.CenterScreen;
-                                            form.Size = img.Size;
-
-                                            PictureBox pb = new PictureBox()
+                                            Assembly myAssembly = Assembly.GetExecutingAssembly();
+                                            Stream myStream = myAssembly.GetManifestResourceStream("SQueLch.rettererDank.png");
+                                            if (myStream != null)
                                             {
-                                                Dock = DockStyle.Fill,
-                                                Image = img
-                                            };
-                                            form.Controls.Add(pb);
-                                            form.ShowDialog();
+                                                Bitmap img = new Bitmap(myStream);
+
+                                                form.StartPosition = FormStartPosition.CenterScreen;
+                                                form.Size = img.Size;
+
+                                                PictureBox pb = new PictureBox()
+                                                {
+                                                    Dock = DockStyle.Fill,
+                                                    Image = img
+                                                };
+                                                form.Controls.Add(pb);
+                                                form.ShowDialog();
+                                            }
                                         }
-                                    }
+                                    }));
                                 }
                             }
                             //unrecognized command
@@ -236,6 +293,7 @@ namespace SQueLch
                         }
                     }
 
+                    e.SuppressKeyPress = true;
                 }
 
                 //ctrl + backspace

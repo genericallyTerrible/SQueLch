@@ -397,7 +397,6 @@ namespace SQueLch
             SelectedDb.Text = SelectedDb.Text;
             tv.EndUpdate();
         }
-
         #endregion
 
         #region Expanded TreeNode resoration
