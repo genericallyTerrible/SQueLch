@@ -39,11 +39,6 @@ namespace SQueLch
             ActiveControl = consoleTbx;
         }
 
-        private void SQueLchForm_Shown(object sender, EventArgs e)
-        {
-            Connect();
-        }
-
         private void SQueLchForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             sqlAPI.Close();
@@ -81,9 +76,13 @@ namespace SQueLch
 
                 UpdateSchemas();
 
-                if (!success)
+                if (success)
                 {
-                    outputTbx.AppendText("ERROR: Failed to connect to server" + Environment.NewLine);
+                    outputTbx.AppendText("Successfully connected to: " + connectForm.ConnectionParams.ServerIP.ToString() + Environment.NewLine);
+                }
+                else
+                {
+                    outputTbx.AppendText("ERROR: Failed to connect to: " + connectForm.ConnectionParams.ServerIP.ToString() + Environment.NewLine);
                     outputTbx.AppendText("Use command \"!connect\" to try again." + Environment.NewLine);
                 }
             }
@@ -98,9 +97,20 @@ namespace SQueLch
 
             UpdateSchemas();
 
-            if (!success)
+            //Extracts the hostname from the connection string
+            string server = "server=";
+            int hostStartIndex = connectionString.IndexOf(server) + server.Length;
+            string hostEnd = ";";
+            int hostLength = connectionString.IndexOf(hostEnd) - hostStartIndex;
+            string hostname = connectionString.Substring(hostStartIndex, hostLength);
+
+            if (success)
             {
-                outputTbx.AppendText("ERROR: Failed to connect to server" + Environment.NewLine);
+                outputTbx.AppendText("Successfully connected to: " + hostname + Environment.NewLine);
+            }
+            else
+            {
+                outputTbx.AppendText("ERROR: Failed to connect to: " + hostname + Environment.NewLine);
                 outputTbx.AppendText("Use command \"!connect\" to try again." + Environment.NewLine);
             }
 
@@ -289,7 +299,7 @@ namespace SQueLch
                         //MySQL command
                         else
                         {
-                            Query(consoleText);
+                            Query(consoleTbx.Text);
                             /*
                             List<List<string>> results = sqlAPI.QueryStr(consoleTbx.Text);
                             foreach (List<string> row in results)

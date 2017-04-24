@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SQueLchForm));
             this.schemasTree = new System.Windows.Forms.TreeView();
             this.schemaLbl = new System.Windows.Forms.Label();
             this.resultDGV = new System.Windows.Forms.DataGridView();
@@ -98,6 +99,7 @@
             this.outputTbx.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.outputTbx.Size = new System.Drawing.Size(357, 177);
             this.outputTbx.TabIndex = 7;
+            this.outputTbx.Text = resources.GetString("outputTbx.Text");
             this.outputTbx.WordWrap = false;
             // 
             // outputLbl
@@ -149,7 +151,6 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "SQueLch";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SQueLchForm_FormClosing);
-            this.Shown += new System.EventHandler(this.SQueLchForm_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.resultDGV)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
