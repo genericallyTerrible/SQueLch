@@ -59,7 +59,14 @@ namespace SQueLch
             outputTbx.AppendText(result.Action + Environment.NewLine);
             outputTbx.AppendText(result.Message + Environment.NewLine);
 
+            UpdateSchemas();
+        }
+
+        private void UpdateSchemas()
+        {
+            updateSchemasBtn.Enabled = false;
             sqlAPI.GenerateDatabases(schemasTree);
+            updateSchemasBtn.Enabled = true;
         }
 
         private bool Connect()
@@ -71,9 +78,10 @@ namespace SQueLch
             if (connectForm.DialogResult == DialogResult.OK)
             {
                 success = sqlAPI.Connect(connectForm.ConnectionParams.ToString());
-                if (success)
-                    sqlAPI.GenerateDatabases(schemasTree);
-                else
+
+                UpdateSchemas();
+
+                if (!success)
                 {
                     outputTbx.AppendText("ERROR: Failed to connect to server" + Environment.NewLine);
                     outputTbx.AppendText("Use command \"!connect\" to try again." + Environment.NewLine);
@@ -83,13 +91,14 @@ namespace SQueLch
             return success;
         }
 
+
         private bool Connect(string connectionString)
         {
             bool success = sqlAPI.Connect(connectionString);
 
-            if (success)
-                sqlAPI.GenerateDatabases(schemasTree);
-            else
+            UpdateSchemas();
+
+            if (!success)
             {
                 outputTbx.AppendText("ERROR: Failed to connect to server" + Environment.NewLine);
                 outputTbx.AppendText("Use command \"!connect\" to try again." + Environment.NewLine);
@@ -197,7 +206,7 @@ namespace SQueLch
                             //update command
                             else if (consoleSplit[0].Equals(commands[3]))
                             {
-                                UpdateSchemasBtn_Click(sender, e);
+                                UpdateSchemas();
                             }
                             //connect command
                             else if (consoleSplit[0].Equals(commands[4]))
@@ -350,9 +359,7 @@ namespace SQueLch
 
         private void UpdateSchemasBtn_Click(object sender, EventArgs e)
         {
-            updateSchemasBtn.Enabled = false;
-            sqlAPI.GenerateDatabases(schemasTree);
-            updateSchemasBtn.Enabled = true;
+            UpdateSchemas();
         }
 
         private void SchemasTree_KeyDown(object sender, KeyEventArgs e)
