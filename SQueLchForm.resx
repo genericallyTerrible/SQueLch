@@ -117,4 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="outputTbx.Text" xml:space="preserve">
+    <value>Welcome to SQueLch!
+To get started, open a connection with "!connect"
+For a list of all commands type "!help"
+For help with specific commands type "!help &lt;command&gt;"
+where &lt;command&gt; is the command you want help with.
+Ctrl + Enter submits commands
+
+</value>
+  </data>
 </root>
