@@ -90,7 +90,6 @@ namespace SQueLch
             return success;
         }
 
-
         private bool Connect(string connectionString)
         {
             bool success = sqlAPI.Connect(connectionString);
@@ -132,12 +131,13 @@ namespace SQueLch
                         //User command
                         if (consoleText[0] == '!')
                         {
-                            string[] consoleSplit = consoleText.Substring(1).Split(' ');
-
+                            string[] argv = consoleText.Substring(1).Split(' ');
+                            int argc = argv.Count();
+                            
                             //help command
-                            if (consoleSplit[0].Equals(commands[0]))
+                            if (argv[0].Equals(commands[0]))
                             {
-                                if (consoleSplit.Count() == 1)
+                                if (argc == 1)
                                 {
                                     outputTbx.AppendText("List of registered commands:" + Environment.NewLine);
                                     for (int i = 1; i < commands.Count() - 1; i++)
@@ -148,12 +148,12 @@ namespace SQueLch
                                 else
                                 {
                                     //help with exit
-                                    if (consoleSplit[1] == commands[1])
+                                    if (argv[1] == commands[1])
                                     {
                                         outputTbx.AppendText("Closes the application." + Environment.NewLine);
                                     }
                                     //help with clear
-                                    else if (consoleSplit[1] == commands[2])
+                                    else if (argv[1] == commands[2])
                                     {
                                         outputTbx.AppendText("Clears the contents of a specified container." + Environment.NewLine);
                                         outputTbx.AppendText("\t-a: Clears all elements in bot the Output TextBox" + Environment.NewLine);
@@ -163,13 +163,13 @@ namespace SQueLch
                                         outputTbx.AppendText("\t    and the Results DataGridView" + Environment.NewLine);
                                     }
                                     //help with update
-                                    else if (consoleSplit[1] == commands[3])
+                                    else if (argv[1] == commands[3])
                                     {
                                         outputTbx.AppendText("Forces an update of the Schemas TreeView." + Environment.NewLine);
                                         outputTbx.AppendText("Functionally identical to clicking the Update Schemas Button." + Environment.NewLine);
                                     }
                                     //help with connect
-                                    else if (consoleSplit[1] == commands[4])
+                                    else if (argv[1] == commands[4])
                                     {
                                         outputTbx.AppendText("Used to change connected databases." + Environment.NewLine);
                                         outputTbx.AppendText("\t-d: Attempts to connect to a local database with default credentials" + Environment.NewLine);
@@ -186,16 +186,16 @@ namespace SQueLch
                                 outputTbx.AppendText(Environment.NewLine);
                             }
                             //exit command
-                            else if (consoleSplit[0].Equals(commands[1]))
+                            else if (argv[0].Equals(commands[1]))
                             {
                                 Application.Exit();
                             }
                             //clear command
-                            else if (consoleSplit[0].Equals(commands[2]))
+                            else if (argv[0].Equals(commands[2]))
                             {
-                                for (int i = 1; i < consoleSplit.Count(); i++)
+                                for (int i = 1; i < argc; i++)
                                 {
-                                    switch (consoleSplit[i])
+                                    switch (argv[i])
                                     {
                                         case "-a":
                                             outputTbx.Text = "";
@@ -214,22 +214,22 @@ namespace SQueLch
                                 }
                             }
                             //update command
-                            else if (consoleSplit[0].Equals(commands[3]))
+                            else if (argv[0].Equals(commands[3]))
                             {
                                 UpdateSchemas();
                             }
                             //connect command
-                            else if (consoleSplit[0].Equals(commands[4]))
+                            else if (argv[0].Equals(commands[4]))
                             {
                                 //Basic connect, show ConnectionForm
-                                if (consoleSplit.Count() == 1)
+                                if (argc == 1)
                                 {
                                     BeginInvoke(new Action(() => Connect()));
                                 }
                                 //Connect with flags
                                 else
                                 {
-                                    switch (consoleSplit[1])
+                                    switch (argv[1])
                                     {
                                         //attempt to connect using default localhost settings
                                         case "-d":
@@ -259,9 +259,9 @@ namespace SQueLch
                                 }
                             }
                             //it's a secret
-                            else if (consoleSplit[0].Equals(commands[commands.Count - 1]))
+                            else if (argv[0].Equals(commands[commands.Count - 1]))
                             {
-                                if (consoleSplit.Count() == 2 && consoleSplit[1] == "-ass")
+                                if (argc == 2 && argv[1] == "-ass")
                                 {
                                     //Dankest of memes
                                     BeginInvoke(new Action(() =>
